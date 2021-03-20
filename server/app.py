@@ -1,8 +1,9 @@
 import uuid
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-
-
+import pandas, os
+import json
+""" 
 BOOKS = [
     {
         'id': uuid.uuid4().hex,
@@ -23,12 +24,53 @@ BOOKS = [
         'read': True
     }
 ]
+print(BOOKS)
+"""
+BOOKS = [
+	{
+		"id":"a1z",
+		"title":"xOn the Road",
+		"author":"Kerouac",
+		"read":True
+	},
+    {
+		"id":"b2y",
+		"title":"xHarry Potter and the Philosopher's Stone",
+		"author":"J.K. Rowling",
+		"read":False
+	},
+    {
+		"id":"c3x",
+		"title":"xGreen Eggs and Ham",
+		"author":"Dr. Seuss",
+		"read":True
+	}
+]
+print(BOOKS)
 
+def stopwatchPrint(func):
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+        print(f"{func.__name__}: {end - start:.3f} s.")
+        return result
+
+    return wrapper
+
+def getdatapath(name):
+    return os.path.join(os.path.dirname(__file__), "data", name)
+
+df = pandas.read_csv(getdatapath('books.csv'), sep=',')
+BOOKS2 = json.loads(df.to_json(orient='records'))
+print(BOOKS2)
 
 # configuration
 DEBUG = True
 
-# instantiate the app
+# instantiate the apppyth   
 app = Flask(__name__)
 app.config.from_object(__name__)
 
@@ -63,7 +105,10 @@ def all_books():
         })
         response_object['message'] = 'Book added!'
     else:
-        response_object['books'] = BOOKS
+        response_object['books'] = BOOKS2
+        print(BOOKS2)
+
+
     return jsonify(response_object)
 
 
